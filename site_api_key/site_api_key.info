@@ -1,0 +1,9 @@
+name = Site API Key
+description = Module is used for adding "Site API Key" to the "Site Information" form.
+package = custom
+core = 7.x
+
+configure = admin/config/system/site-information
+
+version = 7.x-1.0
+timestamp = '1475947904'

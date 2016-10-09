@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * Main module file.
+ * @author - sushantverma.it@gmail.com
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function site_api_key_menu() {
+  $siteapikey_value = variable_get('siteapikey', '');
+  $items['page_json/%/%'] = array( //page_json/<%siteapikey>/<%nid> are used as arguments.
+    'page callback' => 'page_node_json',
+    'page arguments' => array(1, 2), //passing arg() variables to the custom page.
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_form_id_alter() is used for altering the form.
+ */
+function site_api_key_form_system_site_information_settings_alter(&$form, $form_state, $form_id) {
+  $form['site_information']['siteapikey'] = array(
+   '#title' => t('Site API Key'),
+   '#type' => 'textfield',
+   '#default_value' => variable_get('siteapikey', 'No API Key yet'),
+  );
+  //Change of submit button value.
+  $form['actions']['submit']['#value']= !empty(variable_get('siteapikey', '')) ? t('Update Configuration') : t('Save Configuration');
+  $form['#submit'][] = 'submit_siteapikey_handler';
+}
+
+/**
+ * Custom submit handler to print message on form submit.
+ */
+function submit_siteapikey_handler($form, &$form_state) {
+  $siteapikey_value = variable_get('siteapikey', '');
+  //Checked for siteapikey value is not empty.
+  if (!empty($siteapikey_value)) {
+    drupal_set_message( t('Site API Key has been saved with value siteapikey', array('siteapikey' => $siteapikey_value)) );
+  }
+}
+
+/**
+ * Custom function for handling json and Site API Key authentication.
+ */
+function page_node_json($apikey, $nid) {
+  if (!empty($apikey) && !empty($nid)) {
+    $siteapikey_value = variable_get('siteapikey', '');
+    $node = node_load($nid); //load's node object
+    //Checked for content type and Site API Key.
+   if (!empty($node) && $node->type == 'page' && !empty($siteapikey_value) && ($apikey == $siteapikey_value)) {
+    $json_data = $node;
+   }
+   else{
+    $json_data = array('page-access' => 'access denied');
+   }
+  }
+  //Output as json using drupal_json_output function.
+  return drupal_json_output($json_data);
+}
