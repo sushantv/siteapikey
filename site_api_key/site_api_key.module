@@ -8,8 +8,7 @@
 /**
  * Implements hook_menu().
  */
-function site_api_key_menu() {
-  $siteapikey_value = variable_get('siteapikey', '');
+function site_api_key_menu() {  
   $items['page_json/%/%'] = array( //page_json/<%siteapikey>/<%nid> are used as arguments.
     'page callback' => 'page_node_json',
     'page arguments' => array(1, 2), //passing arg() variables to the custom page.
